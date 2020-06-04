@@ -1,6 +1,9 @@
+from selenium.webdriver.support.wait import WebDriverWait
+
 from .base_page import BasePage
 from .locators import ProductPageLocators
-from selenium.common.exceptions import NoAlertPresentException
+from selenium.common.exceptions import NoAlertPresentException, TimeoutException
+from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 
 import math
@@ -28,7 +31,15 @@ class ProductPage(BasePage):
     def get_a_shown_book_name(self):
         return self.browser.find_element(*ProductPageLocators.ITEM_NAME).text
 
-    def verify_the_notification(self):
+    def verify_the_item_name_in_notification(self):
         notification_area = self.browser.find_element(*ProductPageLocators.ALERT)  # go deeper
         text_after_adding = notification_area.text
         assert text_after_adding == self.get_a_shown_book_name()
+
+    def no_success_message(self):
+        assert not self.is_element_present(*ProductPageLocators.ALERT), \
+            "Success message is presented"
+
+    def success_message_disappears(self, timeout=4):
+        assert self.is_disappeared(*ProductPageLocators.ALERT), \
+            "Success message does not disappear"
