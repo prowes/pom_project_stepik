@@ -1,5 +1,8 @@
 from .base_page import BasePage
 from .locators import ProductPageLocators
+from selenium.common.exceptions import NoAlertPresentException
+from time import sleep
+
 import math
 
 class ProductPage(BasePage):
@@ -13,6 +16,7 @@ class ProductPage(BasePage):
         answer = str(math.log(abs((12 * math.sin(float(x))))))
         alert.send_keys(answer)
         alert.accept()
+        sleep(5)
         try:
             alert = self.browser.switch_to.alert
             alert_text = alert.text
@@ -20,3 +24,11 @@ class ProductPage(BasePage):
             alert.accept()
         except NoAlertPresentException:
             print("No second alert presented")
+
+    def get_a_shown_book_name(self):
+        return self.browser.find_element(*ProductPageLocators.ITEM_NAME).text
+
+    def verify_the_notification(self):
+        notification_area = self.browser.find_element(*ProductPageLocators.ALERT)  # go deeper
+        text_after_adding = notification_area.text
+        assert text_after_adding == self.get_a_shown_book_name()
